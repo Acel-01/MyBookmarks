@@ -7,6 +7,9 @@ name = "pypi"
 django = "==4.2.3"
 djangorestframework = "==3.14.0"
 python-decouple = "==3.6"
+djangorestframework-simplejwt = "==5.2.2"
+djoser = "==2.2.0"
+django-mailjet = "==0.3.1"
 
 [dev-packages]
 
