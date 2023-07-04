@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     # local
     'users',
     'bookmarks',
+    'folders',
 ]
 
 MIDDLEWARE = [
