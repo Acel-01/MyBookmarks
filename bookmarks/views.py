@@ -3,6 +3,13 @@ from bookmarks.models import Bookmark
 from bookmarks.serializers import BookmarkSerializer
 
 # Create your views here.
+class BookmarkCreate(generics.CreateAPIView):
+    queryset = Bookmark.objects.all()
+    serializer_class = BookmarkSerializer
+    
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
 class BookmarkList(generics.ListAPIView):
     queryset = Bookmark.objects.all()
     serializer_class = BookmarkSerializer
@@ -10,13 +17,6 @@ class BookmarkList(generics.ListAPIView):
     def get_queryset(self):
         user = self.request.user
         return Bookmark.objects.filter(user=user)
-
-class BookmarkCreate(generics.CreateAPIView):
-    queryset = Bookmark.objects.all()
-    serializer_class = BookmarkSerializer
-    
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
 
 class BookmarkRetrieve(generics.RetrieveAPIView):
     queryset = Bookmark.objects.all()
