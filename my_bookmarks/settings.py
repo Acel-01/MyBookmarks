@@ -45,6 +45,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'djoser',
+    'treblle',
+
 
     # local
     'users',
@@ -58,6 +60,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    'treblle.middleware.TreblleMiddleware',
 ]
 
 ROOT_URLCONF = "my_bookmarks.urls"
@@ -166,3 +169,9 @@ EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
 EMAIL_TIMEOUT = 30
 DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL")
+
+
+TREBLLE_INFO = {
+    'api_key': config('TREBLLE_API_KEY'),
+    'project_id': config('TREBLLE_PROJECT_ID')
+}
