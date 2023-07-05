@@ -145,8 +145,31 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    )
+    ),
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle'
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '2/min',
+        'user': '4/min'
+    }
 }
+
+def get_throttle_time(path=REST_FRAMEWORK['DEFAULT_THROTTLE_RATES']['user']):
+    """
+    get the time for a throttle class and convert it to seconds
+    """
+    path = path.split('/')
+    if path[1] == 'sec' or path[1] == 's':
+        return path[0]
+    elif path[1] == 'min' or path[1] == 'm':
+        return str(int(path[0])*60)
+    elif path[1] == 'hour' or path[1] == 'h':
+        return str(int(path[0])*60*60)
+    elif path[1] == 'day' or path[1] == 'd':
+        return str(int(path[0])*60*60*24)
+    
 SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('JWT',),
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
