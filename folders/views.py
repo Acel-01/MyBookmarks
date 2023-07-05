@@ -1,5 +1,6 @@
 from rest_framework import viewsets
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, throttle_classes
+from rest_framework.throttling import UserRateThrottle
 from rest_framework.response import Response
 from rest_framework import status
 from folders.models import Folder
@@ -15,6 +16,7 @@ class FolderViewSet(viewsets.ModelViewSet):
     A simple ViewSet for viewing and editing the 
     folders associated with the user.
     """
+    throttle_classes = [UserRateThrottle]
     serializer_class = FolderSerializer
 
     def perform_create(self, serializer):
@@ -26,6 +28,7 @@ class FolderViewSet(viewsets.ModelViewSet):
     
 
 @api_view(['POST'])
+@throttle_classes([UserRateThrottle])
 def add_bookmark_to_folder(request):
     context = {'request':request}
     serializer = ValidateInputFolderSerializer(data=request.data, context=context)
@@ -45,7 +48,7 @@ def add_bookmark_to_folder(request):
                 else:
                     folder.bookmark.add(bookmark)
                 serializer = FolderSerializer(folder, many=False)
-                return Response(serializer.data, status=status.HTTP_200_OK)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
             else:
                 return Response({"detail": "Folder not found."}, status=status.HTTP_404_NOT_FOUND)
         else:
@@ -54,6 +57,7 @@ def add_bookmark_to_folder(request):
         return Response({"detail": e}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['DELETE'])
+@throttle_classes([UserRateThrottle])
 def remove_bookmark_from_folder(request):
     context = {'request':request}
     serializer = ValidateInputFolderSerializer(data=request.data, context=context)

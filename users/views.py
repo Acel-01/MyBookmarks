@@ -1,5 +1,6 @@
 from rest_framework import generics
 from rest_framework.permissions import AllowAny
+from rest_framework.throttling import AnonRateThrottle
 from djoser import signals
 from djoser.conf import settings
 from djoser.compat import get_user_email
@@ -13,6 +14,7 @@ class ConfirmationEmail(BaseEmailMessage):
     template_name = "confirmation_email.html"
     
 class UserCreate(generics.CreateAPIView):
+    throttle_classes = [AnonRateThrottle]
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [AllowAny]
