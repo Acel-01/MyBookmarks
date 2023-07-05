@@ -5,6 +5,7 @@ from djoser import signals
 from djoser.conf import settings
 from djoser.compat import get_user_email
 from templated_mail.mail import BaseEmailMessage
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from users.models import User
 from users.serializers import UserSerializer
 
@@ -39,3 +40,9 @@ class UserCreate(generics.CreateAPIView):
         context = {"user": user}
         to = [get_user_email(user)]
         settings.EMAIL.confirmation(self.request, context).send(to)
+
+class ThrottleTokenObtainPairView(TokenObtainPairView):
+    throttle_classes = [AnonRateThrottle]
+
+class ThrottleTokenRefreshView(TokenRefreshView):
+    throttle_classes = [AnonRateThrottle]
