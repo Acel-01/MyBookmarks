@@ -24,37 +24,37 @@ Before running the project, ensure you have the following software installed on 
 Follow these steps to set up and run the Django project:
 
 
-####1. Clone the project repository:
+**1. Clone the project repository:**
    
 
     git clone https://github.com/Acel-01/MyBookmarks.git
 
 
-####2. Change into the project directory:
+**2. Change into the project directory:**
    
    
     cd MyBookmarks/
 
 
-####3. Install project dependencies using Pipenv:
+**3. Install project dependencies using Pipenv:**
    
     
     pipenv install
 
 
-####4. Activate the virtual environment:
+**4. Activate the virtual environment:**
 
 
     pipenv shell
 
 
-####5. Apply database migrations:
+**5. Apply database migrations:**
    
 
     python manage.py migrate
 
 
-####6. Start the development server:
+**6. Start the development server:**
    
 
      python manage.py runserver
