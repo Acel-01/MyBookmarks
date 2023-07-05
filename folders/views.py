@@ -1,4 +1,4 @@
-from rest_framework import generics
+from rest_framework import viewsets
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
@@ -10,45 +10,20 @@ from folders.serializers import (
 )
 
 # Create your views here.
-class FolderCreate(generics.CreateAPIView):
-    queryset = Folder.objects.all()
+class FolderViewSet(viewsets.ModelViewSet):
+    """
+    A simple ViewSet for viewing and editing the 
+    folders associated with the user.
+    """
     serializer_class = FolderSerializer
-    
+
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
-class FolderList(generics.ListAPIView):
-    queryset = Folder.objects.all()
-    serializer_class = FolderSerializer
-
-    def get_queryset(self):
-        user = self.request.user
-        return Folder.objects.filter(user=user)
-
-class FolderRetrieve(generics.RetrieveAPIView):
-    queryset = Folder.objects.all()
-    serializer_class = FolderSerializer
-
     def get_queryset(self):
         user = self.request.user
         return Folder.objects.filter(user=user)
     
-class FolderUpdate(generics.UpdateAPIView):
-    queryset = Folder.objects.all()
-    serializer_class = FolderSerializer
-
-    def get_queryset(self):
-        user = self.request.user
-        return Folder.objects.filter(user=user)
-    
-class FolderDelete(generics.DestroyAPIView):
-    queryset = Folder.objects.all()
-    serializer_class = FolderSerializer
-
-    def get_queryset(self):
-        user = self.request.user
-        return Folder.objects.filter(user=user)
-
 
 @api_view(['POST'])
 def add_bookmark_to_folder(request):
