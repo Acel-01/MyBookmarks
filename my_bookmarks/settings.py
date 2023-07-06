@@ -26,9 +26,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DJANGO_DEBUG', default=False, cast=bool)
+# DEBUG = config('DJANGO_DEBUG', default=False, cast=bool)
+DEBUG = True
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS').split(',')
+# ALLOWED_HOSTS = config('ALLOWED_HOSTS').split(',')
+ALLOWED_HOSTS = ['127.0.0.1','localhost']
 
 
 # Application definition
@@ -173,10 +175,10 @@ SIMPLE_JWT = {
 
 DJOSER = {
     'USER_CREATE_PASSWORD_RETYPE': True,
-    # 'SEND_CONFIRMATION_EMAIL': True,
-    # 'EMAIL': {
-    #     'confirmation': 'users.views.ConfirmationEmail',
-    # },
+    'SEND_CONFIRMATION_EMAIL': False,
+    'EMAIL': {
+        'confirmation': 'users.views.ConfirmationEmail',
+    },
 }
 
 # EMAIL_BACKEND = 'django_mailjet.backends.MailjetBackend'

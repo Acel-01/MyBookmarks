@@ -36,7 +36,7 @@ class BookmarkViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(instance)
         data = serializer.data
         data["message"] = f"Details of bookmark with uuid: {data['uuid']}"
-        return Response(serializer.data)
+        return Response(data)
 
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)

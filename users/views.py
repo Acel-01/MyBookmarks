@@ -50,9 +50,9 @@ class UserCreate(generics.CreateAPIView):
             sender=self.__class__, user=user, request=self.request
         )
 
-        context = {"user": user}
-        to = [get_user_email(user)]
-        settings.EMAIL.confirmation(self.request, context).send(to)
+        # context = {"user": user}
+        # to = [get_user_email(user)]
+        # settings.EMAIL.confirmation(self.request, context).send(to)
 
 
 class ThrottleTokenObtainPairView(TokenObtainPairView):
