@@ -5,7 +5,7 @@ from bookmarks.models import Bookmark
 
 # Create your models here.
 class Folder(models.Model):
-    id = models.UUIDField(
+    uuid = models.UUIDField(
         primary_key = True, 
         default = uuid.uuid4,
         editable = False

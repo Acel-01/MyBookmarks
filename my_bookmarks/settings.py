@@ -26,9 +26,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DJANGO_DEBUG', default=False, cast=bool)
+# DEBUG = config('DJANGO_DEBUG', default=False, cast=bool)
+DEBUG = True
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS').split(',')
+# ALLOWED_HOSTS = config('ALLOWED_HOSTS').split(',')
+ALLOWED_HOSTS = ['127.0.0.1','localhost']
 
 
 # Application definition
@@ -63,6 +65,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     'treblle.middleware.TreblleMiddleware',
+    'my_bookmarks.middleware.RateLimitResponseHeaderMiddleware',
 ]
 
 ROOT_URLCONF = "my_bookmarks.urls"
@@ -146,6 +149,9 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+
+    'PAGE_SIZE': 5,
     'DEFAULT_THROTTLE_CLASSES': [
         'rest_framework.throttling.AnonRateThrottle',
         'rest_framework.throttling.UserRateThrottle'
@@ -153,33 +159,37 @@ REST_FRAMEWORK = {
     'DEFAULT_THROTTLE_RATES': {
         'anon': '2/min',
         'user': '4/min'
-    }
+    },
+    'DEFAULT_RENDERER_CLASSES': [
+        'my_bookmarks.renderers.APIRenderer',
+    ],
+    'EXCEPTION_HANDLER': 'my_bookmarks.utils.custom_exception_handler'
 }
     
 SIMPLE_JWT = {
-    'AUTH_HEADER_TYPES': ('JWT',),
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=14),
-    'USER_ID_FIELD': 'id',
+    'USER_ID_FIELD': 'uuid',
     'USER_ID_CLAIM': 'user_id',
 }
+
 DJOSER = {
     'USER_CREATE_PASSWORD_RETYPE': True,
-    'SEND_CONFIRMATION_EMAIL': True,
+    'SEND_CONFIRMATION_EMAIL': False,
     'EMAIL': {
         'confirmation': 'users.views.ConfirmationEmail',
     },
 }
 
-EMAIL_BACKEND = 'django_mailjet.backends.MailjetBackend'
-EMAIL_HOST = 'in-v3.mailjet.com'
-MAILJET_API_KEY = config("MAILJET_API_KEY")
-MAILJET_API_SECRET = config("MAILJET_API_SECRET")
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_USE_SSL = False
-EMAIL_TIMEOUT = 30
-DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL")
+# EMAIL_BACKEND = 'django_mailjet.backends.MailjetBackend'
+# EMAIL_HOST = 'in-v3.mailjet.com'
+# MAILJET_API_KEY = config("MAILJET_API_KEY")
+# MAILJET_API_SECRET = config("MAILJET_API_SECRET")
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+# EMAIL_USE_SSL = False
+# EMAIL_TIMEOUT = 30
+# DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL")
 
 
 TREBLLE_INFO = {
