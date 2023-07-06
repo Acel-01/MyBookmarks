@@ -6,7 +6,7 @@ from users.serializers import UserSerializer
 class BookmarkSerializer(serializers.ModelSerializer):
     class Meta:
         model = Bookmark
-        fields = ['id', 'user', 'text', 'date_created']
+        fields = ['uuid', 'user', 'title', 'link', 'date_created']
         read_only_fields = ('user',)
 
 
@@ -15,7 +15,7 @@ class FolderSerializer(serializers.ModelSerializer):
     bookmark = BookmarkSerializer(many=True, read_only=True)
     class Meta:
         model = Folder
-        fields = ['id', 'user', 'name', 'bookmark', 'date_created']
+        fields = ['uuid', 'user', 'name', 'bookmark', 'date_created']
         read_only_fields = ('user',)
 
 class ValidateInputFolderSerializer(serializers.ModelSerializer):
@@ -23,5 +23,5 @@ class ValidateInputFolderSerializer(serializers.ModelSerializer):
     bookmark = serializers.UUIDField(format='hex_verbose')
     class Meta:
         model = Folder
-        fields = ['id', 'user', 'name', 'bookmark', 'date_created']
+        fields = ['uuid', 'user', 'name', 'bookmark', 'date_created']
         read_only_fields = ('user',)
