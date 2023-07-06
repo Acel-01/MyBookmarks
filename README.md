@@ -41,20 +41,31 @@ Follow these steps to set up and run the Django project:
     
     pipenv install
 
+**4. Create a .env file and Populate it using the .env.example file:**
+   
 
-**4. Activate the virtual environment:**
+     touch .env
+
+**5. Activate the virtual environment:**
 
 
     pipenv shell
 
 
-**5. Apply database migrations:**
+**6. Apply database migrations:**
    
 
     python manage.py migrate
 
 
-**6. Start the development server:**
+**7. Start the development server:**
    
 
      python manage.py runserver
+
+
+
+**Link to Documentation:**
+
+
+    https://documenter.getpostman.com/view/16320940/2s93zFXKcL

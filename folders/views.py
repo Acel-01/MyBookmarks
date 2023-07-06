@@ -1,9 +1,11 @@
 from rest_framework import viewsets
-from rest_framework.decorators import api_view, throttle_classes
-from rest_framework.exceptions import NotFound
+from rest_framework.decorators import api_view, throttle_classes, renderer_classes
+from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.throttling import UserRateThrottle
 from rest_framework.response import Response
 from rest_framework import status
+from django.core import exceptions
+from my_bookmarks.renderers import APIRenderer
 from folders.models import Folder
 from bookmarks.models import Bookmark
 from folders.serializers import (
@@ -81,6 +83,7 @@ class FolderViewSet(viewsets.ModelViewSet):
 
 @api_view(['POST'])
 @throttle_classes([UserRateThrottle])
+@renderer_classes([APIRenderer])
 def add_bookmark_to_folder(request):
     context = {'request': request}
     serializer = ValidateInputFolderSerializer(data=request.data, context=context)
@@ -89,13 +92,19 @@ def add_bookmark_to_folder(request):
             bookmark_id = request.data.get('bookmark')
             folder_name = request.data.get('name')
 
-            bookmark = Bookmark.objects.filter(user=request.user, id=bookmark_id).first()
-            if not bookmark:
-                raise NotFound("Bookmark not found")
+            try:
+                bookmarks = Bookmark.objects.filter(user=request.user, uuid=bookmark_id)
+                if not bookmarks:
+                    raise NotFound({"message": "Bookmark not found"})
+            except exceptions.ValidationError:
+                raise ValidationError({"message": "Enter a valid UUID"})
+            # except:
+            #     raise NotFound("Bookmark not found")
+            bookmark = bookmarks.first()
 
             folder = Folder.objects.filter(user=request.user, name=folder_name).first()
             if folder:
-                if folder.bookmark.filter(id=bookmark.id):
+                if folder.bookmark.filter(uuid=bookmark.uuid):
                     pass
                 else:
                     folder.bookmark.add(bookmark)
@@ -113,6 +122,7 @@ def add_bookmark_to_folder(request):
 
 @api_view(['DELETE'])
 @throttle_classes([UserRateThrottle])
+@renderer_classes([APIRenderer])
 def remove_bookmark_from_folder(request):
     context = {'request': request}
     serializer = ValidateInputFolderSerializer(data=request.data, context=context)
@@ -121,8 +131,11 @@ def remove_bookmark_from_folder(request):
             bookmark_id = request.data.get('bookmark')
             folder_name = request.data.get('name')
 
-            bookmark = Bookmark.objects.filter(user=request.user, id=bookmark_id).first()
-            if not bookmark:
+            try:
+                bookmark = Bookmark.objects.get(user=request.user, uuid=bookmark_id)
+            except TypeError:
+                raise NotFound("Bookmark not found")
+            except:
                 raise NotFound("Bookmark not found")
 
             folder = Folder.objects.filter(user=request.user, name=folder_name).first()
