@@ -60,7 +60,7 @@ class BookmarkViewSet(viewsets.ModelViewSet):
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
-            serializer = self.get_serializer(queryset, many=True)
+            # serializer = self.get_serializer(queryset, many=True)
             data = serializer.data
             message = data[0]
             message["message"]=f'List of {request.user.email} bookmarks gotten successfully.',

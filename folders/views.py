@@ -1,3 +1,4 @@
+from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import viewsets
 from rest_framework.decorators import api_view, throttle_classes, renderer_classes
 from rest_framework.exceptions import NotFound, ValidationError
@@ -68,10 +69,10 @@ class FolderViewSet(viewsets.ModelViewSet):
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
-            serializer = self.get_serializer(queryset, many=True)
+            # serializer = self.get_serializer(queryset, many=True)
             data = serializer.data
             message = data[0]
-            message["message"]=f'List of {request.user.email} folders gotten successfully.',
+            message["message"] = f'List of {request.user.email} folders gotten successfully.',
             return self.get_paginated_response(data)
 
         serializer = self.get_serializer(queryset, many=True)
@@ -81,70 +82,50 @@ class FolderViewSet(viewsets.ModelViewSet):
         }
         return Response(data)
 
+
 @api_view(['POST'])
 @throttle_classes([UserRateThrottle])
 @renderer_classes([APIRenderer])
 def add_bookmark_to_folder(request):
     context = {'request': request}
     serializer = ValidateInputFolderSerializer(data=request.data, context=context)
-    try:
-        if serializer.is_valid():
-            bookmark_id = request.data.get('bookmark')
-            folder_name = request.data.get('name')
 
-            try:
-                bookmarks = Bookmark.objects.filter(user=request.user, uuid=bookmark_id)
-                if not bookmarks:
-                    raise NotFound({"message": "Bookmark not found"})
-            except exceptions.ValidationError:
-                raise ValidationError({"message": "Enter a valid UUID"})
-            # except:
-            #     raise NotFound("Bookmark not found")
-            bookmark = bookmarks.first()
+    if serializer.is_valid():
+        bookmark = serializer.validated_data.get('bookmark')
+        folder = serializer.validated_data.get('folder')
 
-            folder = Folder.objects.filter(user=request.user, name=folder_name).first()
-            if folder:
-                if folder.bookmark.filter(uuid=bookmark.uuid):
-                    pass
-                else:
-                    folder.bookmark.add(bookmark)
-                serializer = FolderSerializer(folder, many=False)
-                data = serializer.data
-                data["message"] = f"Bookmark has been added to Folder with uuid: {folder.uuid}"
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            else:
-                raise NotFound("Folder not found")
+        if folder.bookmark.filter(uuid=bookmark.uuid):
+            pass
         else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    except Exception as e:
-        return Response({"message": e}, status=status.HTTP_400_BAD_REQUEST)
+            folder.bookmark.add(bookmark)
+        serializer = FolderSerializer(folder, many=False)
+        data = serializer.data
+        data["message"] = f"Bookmark has been added to Folder with uuid: {folder.uuid}"
+        return Response(data, status=status.HTTP_200_OK)
+
+    else:
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['DELETE'])
+@api_view(['POST'])
 @throttle_classes([UserRateThrottle])
 @renderer_classes([APIRenderer])
 def remove_bookmark_from_folder(request):
     context = {'request': request}
     serializer = ValidateInputFolderSerializer(data=request.data, context=context)
-    try:
-        if serializer.is_valid():
-            bookmark_id = request.data.get('bookmark')
-            folder_name = request.data.get('name')
+    if serializer.is_valid():
+        bookmark = serializer.validated_data.get('bookmark')
+        folder = serializer.validated_data.get('folder')
 
-            try:
-                bookmark = Bookmark.objects.get(user=request.user, uuid=bookmark_id)
-            except TypeError:
-                raise NotFound("Bookmark not found")
-            except:
-                raise NotFound("Bookmark not found")
-
-            folder = Folder.objects.filter(user=request.user, name=folder_name).first()
-            if folder:
-                folder.bookmark.remove(bookmark)
-                return Response(data ={"message": f"Bookmark has been removed from Folder with uuid: {folder.uuid}"}, status=status.HTTP_200_OK)
-            else:
-                raise NotFound("Folder not found")
+        if folder.bookmark.filter(uuid=bookmark.uuid):
+            folder.bookmark.remove(bookmark)
         else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    except Exception as e:
-        return Response({"message": e}, status=status.HTTP_400_BAD_REQUEST)
+            pass
+
+        serializer = FolderSerializer(folder, many=False)
+        data = serializer.data
+        data["message"] = f"Bookmark has been removed from Folder with uuid: {folder.uuid}"
+        return Response(data, status=status.HTTP_200_OK)
+
+    else:
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
