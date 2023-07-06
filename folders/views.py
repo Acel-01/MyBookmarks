@@ -34,7 +34,7 @@ class FolderViewSet(viewsets.ModelViewSet):
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         data = serializer.data
-        data["message"] = f"Folder created successfully with name {data['title']}"
+        data["message"] = f"Folder created successfully with name {data['name']}"
         return Response(data, status=status.HTTP_201_CREATED, headers=headers)
 
     def retrieve(self, request, *args, **kwargs):
